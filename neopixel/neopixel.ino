@@ -1,8 +1,12 @@
-test from Ryan
+// Inlude the Adafruit_NeoPixel library.
 #include <Adafruit_NeoPixel.h>
-#define BUTTON_PIN 2
-#define PIXEL_PIN 6
-#define PIXEL_COUNT  50
+
+// Define constants for pin values.
+const int BUTTON_PIN = 2;
+const int PIXEL_PIN = 6;
+const int PIXEL_COUNT  50;
+
+// Define arrays for Tetrimino pieces.
 int yellow_block[] = {48, 49, 43, 44, 255, 255, 0};
 int purble_T[] = {47, 48, 49, 43, 128, 0, 128};
 int blue_L[] = {47, 42, 43, 44, 0, 0, 255};
