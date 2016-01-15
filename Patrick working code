@@ -14,6 +14,7 @@ int game_board[10][5];
 int r;
 int g;
 int b;
+bool oldbuttonState;
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -29,12 +30,14 @@ void setup() {
     }
   }
   //color_board();
+  oldbuttonState = HIGH;
 }
 
 void loop() {
   //drop_shape();
   //color_board();
-  random_drop();
+  //random_drop();
+  button_push();
 }
 
 void color_board() {
@@ -137,7 +140,7 @@ void button_push(){
     oldbuttonState = LOW;
   }
   if (buttonState == HIGH){
-    oldbuttonState = LOW;
+    oldbuttonState = HIGH;
   }
 }
 
