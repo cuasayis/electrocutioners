@@ -129,7 +129,17 @@ void random_drop(){
   drop_shape();
 }
 
-
+void button_push(){
+  int buttonState = digitalRead(2);
+  if (buttonState == LOW && oldbuttonState == HIGH)
+  {
+    random_drop();
+    oldbuttonState = LOW;
+  }
+  if (buttonState == HIGH){
+    oldbuttonState = LOW;
+  }
+}
 
 
 
