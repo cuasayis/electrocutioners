@@ -1,3 +1,10 @@
+/*NeoPiexl Group Project - ECE 160 - Engineering Practice
+Ryan Greenlee, Izzy Cuasay, and Patrick Tomas
+Revised: 1/18/ 2016
+
+This program creates a tetris game using Adafruit Neopixel.
+*/
+
 // Include the Adafruit_NeoPixel library
 #include <Adafruit_NeoPixel.h>
 
@@ -21,20 +28,27 @@ int g;
 int b;
 bool oldbuttonState;
 
+// Define pixels for the NeoPixel device
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 int showType = 0;
 
 void setup() {
+  // Set pin mode for button.
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+
+  // Initialize pixels
   pixels.begin();
   pixels.show();
+
+  // Map all the pixels to game_board
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 5; j++) {
       int rn = random(1,8);
       game_board[i][j] = rn;
     }
   }
+  
   //color_board();
   oldbuttonState = HIGH;
 }
@@ -47,6 +61,7 @@ void loop() {
 }
 
 void color_board() {
+  // Color the board with random colors.
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 5; j++) {
       if (game_board[i][j] == 0) {
@@ -97,6 +112,7 @@ void color_board() {
 }
 
 void random_drop(){
+  // Selects a random shape to drop on the NeoPixel board.
   int rn = random(1,8);
   switch (rn){
     case 1:
@@ -135,10 +151,13 @@ void random_drop(){
     }
     break;
   }
+
+  // Calls function to display shape on the board.
   drop_shape();
 }
 
 void button_push(){
+  // Drops a shape when button is pressed.
   int buttonState = digitalRead(2);
   if (buttonState == LOW && oldbuttonState == HIGH)
   {
@@ -151,12 +170,14 @@ void button_push(){
 }
 
 void drop_pixels() {
+  // Moves piexel down the board.
   for (int i = 0; i < 4; i++) {
     box[i] = box[i] - 5;
   }
 }
 
 void drop_shape() {
+  // Moves shape down the board.
   int c;
   //for (int i = 0; i < 7; i++) {
   //  box[i] = purple_T[i];
