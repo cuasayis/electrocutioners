@@ -1,4 +1,4 @@
-/*NeoPiexl Group Project - ECE 160 - Engineering Practice
+/*NeoPixel Group Project - ECE 160 - Engineering Practice
 Ryan Greenlee, Izzy Cuasay, and Patrick Tomas
 Revised: 1/18/ 2016
 
