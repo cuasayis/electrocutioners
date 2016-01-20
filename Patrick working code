@@ -2,19 +2,23 @@
 #define BUTTON_PIN 2
 #define PIXEL_PIN 6
 #define PIXEL_COUNT  50
-int yellow_block[] = {48, 49, 43, 44, 255, 255, 0};
-int purple_T[] = {47, 48, 49, 43, 128, 0, 128};
-int blue_L[] = {47, 42, 43, 44, 0, 0, 255};
-int orange_L[] = {49, 42, 43, 44, 255, 165, 0};
-int green_Z[] = {48, 49, 42, 43, 0, 255, 0};
-int red_Z[] = {47, 48, 43, 44, 255, 0, 0};
-int cyan_stick[] = {46, 47, 48, 49, 0, 255, 255};
-int box[7];
+int yellow_block[] = {48, 49, 43, 44, 255, 255, 0, 12};
+int purple_T[] = {49, 48, 43, 47, 128, 0, 128, 22};
+int blue_L[] = {47, 42, 43, 44, 0, 0, 255, 4};
+int orange_L[] = { 42, 43, 44, 49, 255, 165, 0, 8};
+int green_Z[] = { 42, 43, 48, 49, 0, 255, 0, 16};
+int red_Z[] = {47, 48, 43, 44, 255, 0, 0, 24};
+int cyan_stick[] = {46, 47, 48, 49, 0, 255, 255, 0};
+int box[8];
 int game_board[10][5];
 int r;
 int g;
 int b;
 bool oldbuttonState;
+const int xPin = A0;
+const int yPin = A1;
+int xAxis, yAxis;
+bool oldState;
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -25,7 +29,7 @@ void setup() {
   pixels.show();
   for (int i = 0; i < 10; i++) {
     for (int j = 0; j < 5; j++) {
-      int rn = random(1,8);
+      int rn = random(1, 8);
       game_board[i][j] = rn;
     }
   }
@@ -90,67 +94,112 @@ void color_board() {
   pixels.show();
 }
 
-void random_drop(){
-  int rn = random(1,8);
-  switch (rn){
+void random_drop() {
+  int rn = random(1, 8);
+  switch (rn) {
     case 1:
-    for (int i = 0; i < 7; i++) {
-      box[i] = yellow_block[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = yellow_block[i];
+      }
+      break;
     case 2:
-    for (int i = 0; i < 7; i++) {
-      box[i] = purple_T[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = purple_T[i];
+      }
+      break;
     case 3:
-    for (int i = 0; i < 7; i++) {
-      box[i] = blue_L[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = blue_L[i];
+      }
+      break;
     case 4:
-    for (int i = 0; i < 7; i++) {
-      box[i] = orange_L[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = orange_L[i];
+      }
+      break;
     case 5:
-    for (int i = 0; i < 7; i++) {
-      box[i] = green_Z[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = green_Z[i];
+      }
+      break;
     case 6:
-    for (int i = 0; i < 7; i++) {
-      box[i] = red_Z[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = red_Z[i];
+      }
+      break;
     case 7:
-    for (int i = 0; i < 7; i++) {
-      box[i] = cyan_stick[i];
-    }
-    break;
+      for (int i = 0; i < 8; i++) {
+        box[i] = cyan_stick[i];
+      }
+      break;
   }
   drop_shape();
 }
 
-void button_push(){
+void button_push() {
   int buttonState = digitalRead(2);
   if (buttonState == LOW && oldbuttonState == HIGH)
   {
     random_drop();
     oldbuttonState = LOW;
   }
-  if (buttonState == HIGH){
+  if (buttonState == HIGH) {
     oldbuttonState = HIGH;
   }
 }
 
+void drop_delay() {
+  for (int i = 0; i <= 20; i++) {
+    delay(50);
+    xAxis = analogRead(xPin);
+    yAxis = analogRead(yPin);
+    if (xAxis < 650 && yAxis < 650 && yAxis > 350) {
+      oldState = LOW;
+    }
+    if (xAxis > 650 && oldState == LOW) {
+      rotate_shape();
+      oldState = HIGH;
+    }
+    if (yAxis > 650 && oldState == LOW) {
+      move_right();
+      oldState = HIGH;
+    }
+    if (yAxis < 350 && oldState == LOW) {
+      move_left();
+      oldState = HIGH;
+    }
+  }
+}
 
+void move_right() {
 
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(box[i], pixels.Color(0, 0, 0));
+  }
+  pixels.show();
+  for (int i = 0; i < 4; i++) {
+    box[i] = box[i] + 1;
+  }
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
+  }
+  pixels.show();
+}
 
+void move_left() {
 
-
-
-
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(box[i], pixels.Color(0, 0, 0));
+  }
+  pixels.show();
+  for (int i = 0; i < 4; i++) {
+    box[i] = box[i] - 1;
+  }
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
+  }
+  pixels.show();
+}
 
 void drop_pixels() {
   for (int i = 0; i < 4; i++) {
@@ -168,11 +217,209 @@ void drop_shape() {
       pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
     }
     pixels.show();
-    delay(500);
+    drop_delay();
     for (int i = 0; i < 4; i++) {
       pixels.setPixelColor(box[i], pixels.Color(0, 0, 0));
     }
     pixels.show();
     drop_pixels();
   }
+}
+void rotate_shape() {
+  int c1;
+  int c2;
+  int c3;
+  int c4;
+  int copy_box[4];
+  for (int i = 0; i < 4; i++) {
+    copy_box[i] = box[i];
+  }
+  switch (box[7]) {
+    case 0:
+      c1 = 7;
+      c2 = 1;
+      c3 = -5;
+      c4 = -11;
+      break;
+    case 1:
+      c1 = -9;
+      c2 = -5;
+      c3 = -1;
+      c4 = 3;
+      break;
+    case 2:
+      c1 = -7;
+      c2 = -1;
+      c3 = 5;
+      c4 = 11;
+      break;
+    case 3:
+      c1 = 9;
+      c2 = 5;
+      c3 = 1;
+      c4 = -3;
+      break;
+    case 4:
+      c1 = 2;
+      c2 = 6;
+      c3 = 0;
+      c4 = -6;
+      break;
+    case 5:
+      c1 = -10;
+      c2 = -4;
+      c3 = 0;
+      c4 = 4;
+      break;
+    case 6:
+      c1 = -2;
+      c2 = -6;
+      c3 = 0;
+      c4 = 6;
+      break;
+    case 7:
+      c1 = 10;
+      c2 = 4;
+      c3 = 0;
+      c4 = -4;
+      break;
+    case 8:
+      c1 = 6;
+      c2 = 0;
+      c3 = -6;
+      c4 = -10;
+      break;
+    case 9:
+      c1 = -4;
+      c2 = 0;
+      c3 = 4;
+      c4 = -2;
+      break;
+    case 10:
+      c1 = -6;
+      c2 = 0;
+      c3 = 6;
+      c4 = 10;
+      break;
+    case 11:
+      c1 = 4;
+      c2 = 0;
+      c3 = -4;
+      c4 = 2;
+      break;
+    case 12:
+      c1 = 0;
+      c2 = 0;
+      c3 = 0;
+      c4 = 0;
+      break;
+    case 13:
+      c1 = 0;
+      c2 = 0;
+      c3 = 0;
+      c4 = 0;
+      break;
+    case 14:
+      c1 = 0;
+      c2 = 0;
+      c3 = 0;
+      c4 = 0;
+      break;
+    case 15:
+      c1 = 0;
+      c2 = 0;
+      c3 = 0;
+      c4 = 0;
+      break;
+    case 16:
+      c1 = 6;
+      c2 = 0;
+      c3 = -4;
+      c4 = -10;
+      break;
+    case 17:
+      c1 = -4;
+      c2 = 0;
+      c3 = -6;
+      c4 = -2;
+      break;
+    case 18:
+      c1 = -6;
+      c2 = 0;
+      c3 = 4;
+      c4 = 10;
+      break;
+    case 19:
+      c1 = 4;
+      c2 = 0;
+      c3 = 6;
+      c4 = 2;
+      break;
+    case 20:
+      c1 = 6;
+      c2 = 0;
+      c3 = -4;
+      c4 = -6;
+      break;
+    case 21:
+      c1 = -4;
+      c2 = 0;
+      c3 = -6;
+      c4 = 4;
+      break;
+    case 22:
+      c1 = -6;
+      c2 = 0;
+      c3 = 4;
+      c4 = 6;
+      break;
+    case 23:
+      c1 = 4;
+      c2 = 0;
+      c3 = 6;
+      c4 = -4;
+      break;
+    case 24:
+      c1 = 2;
+      c2 = -4;
+      c3 = 0;
+      c4 = -6;
+      break;
+    case 25:
+      c1 = -10;
+      c2 = -6;
+      c3 = 0;
+      c4 = 4;
+      break;
+    case 26:
+      c1 = -2;
+      c2 = 4;
+      c3 = 0;
+      c4 = 6;
+      break;
+    case 27:
+      c1 = 10;
+      c2 = 6;
+      c3 = 0;
+      c4 = -4;
+      break;
+  }
+  box[0] = copy_box[0] + c1;
+  box[1] = copy_box[1] + c2;
+  box[2] = copy_box[2] + c3;
+  box[3] = copy_box[3] + c4;
+  if (box[7] % 4 == 3) {
+    box[7] = box[7] - 3;
+  }
+  else {
+    box[7]++;
+  }
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(copy_box[i], pixels.Color(0, 0, 0));
+  }
+  pixels.show();
+  for (int i = 0; i < 4; i++) {
+    pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
+  }
+  pixels.show();
 }
