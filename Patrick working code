@@ -1,16 +1,16 @@
 #include <Adafruit_NeoPixel.h>
 #define BUTTON_PIN 2
 #define PIXEL_PIN 6
-#define PIXEL_COUNT  50
-int yellow_block[] = {48, 49, 43, 44, 255, 255, 0, 12, 1};
-int purple_T[] = {49, 48, 43, 47, 128, 0, 128, 22, 2};
-int blue_L[] = {47, 42, 43, 44, 0, 0, 255, 4, 3};
-int orange_L[] = { 42, 43, 44, 49, 255, 165, 0, 8, 4};
-int green_Z[] = { 42, 43, 48, 49, 0, 255, 0, 16, 5};
-int red_Z[] = {47, 48, 43, 44, 255, 0, 0, 24, 6};
-int cyan_stick[] = {46, 47, 48, 49, 0, 255, 255, 0, 7};
+#define PIXEL_COUNT  100
+int yellow_block[] = {98, 99, 93, 94, 255, 255, 0, 12, 1};
+int purple_T[] = {99, 98, 97, 93, 128, 0, 128, 22, 2};
+int blue_L[] = {97, 92, 93, 94, 0, 0, 255, 4, 3};
+int orange_L[] = { 92, 93, 94, 99, 255, 165, 0, 8, 4};
+int green_Z[] = { 92, 93, 98, 99, 0, 255, 0, 16, 5};
+int red_Z[] = {97, 98, 93, 94, 255, 0, 0, 24, 6};
+int cyan_stick[] = {96, 97, 98, 99, 0, 255, 255, 0, 7};
 int box[9];
-int game_board[10][5];
+int game_board[20][5];
 int r;
 int g;
 int b;
@@ -21,15 +21,18 @@ const int yPin = A1;
 int xAxis, yAxis;
 bool oldState;
 bool tracker;
+float time_played = 0;
+bool winner;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 int showType = 0;
 void setup() {
+  pinMode(9, INPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pixels.begin();
   pixels.show();
   score = 0;
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 20; i++) {
     for (int j = 0; j < 5; j++) {
       game_board[i][j] = 0;
     }
@@ -39,14 +42,76 @@ void setup() {
 }
 
 void loop() {
-  //drop_shape();
-  //color_board();
-  //random_drop();
   button_push();
 }
 
+void button_push() {
+  int buttonState = digitalRead(9);
+  if (buttonState == LOW && oldbuttonState == HIGH)
+  {
+    oldbuttonState = LOW;
+    game_play();
+  }
+  if (buttonState == HIGH) {
+    oldbuttonState = HIGH;
+  }
+}
+
+void game_play() {
+  bool winner = true;
+  bool exit_ = true;
+  while (time_played < 60 && exit_) {
+    random_drop();
+    for (int j = 0; j < 5; j++) {
+      if (game_board[19][j] != 0) {
+        you_lose();
+        exit_ = false;
+        break;
+      }
+    }
+  }
+  if (winner) {
+    you_win();
+  }
+}
+
+void you_win() {
+  Serial.println("Congrats you won!!!!");
+  Serial.print("Time Played: ");
+  Serial.print(time_played);
+  Serial.print(" |Score: ");
+  Serial.println(score);
+  delay(4000);
+  for (int i = 0; i < 20; i++) {
+    for (int j = 0; j < 5; j++) {
+      game_board[i][j] = 0;
+    }
+  }
+  color_board();
+  time_played = 0;
+  score = 0;
+}
+
+void you_lose() {
+  Serial.println("Sorry, You Lost. Try Again");
+  Serial.print("Time Played: ");
+  Serial.print(time_played);
+  Serial.print(" |Score: ");
+  Serial.println(score);
+  delay(4000);
+  winner = false;
+  for (int i = 0; i < 20; i++) {
+    for (int j = 0; j < 5; j++) {
+      game_board[i][j] = 0;
+    }
+  }
+  color_board();
+  time_played = 0;
+  score = 0;
+}
+
 void color_board() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 20; i++) {
     for (int j = 0; j < 5; j++) {
       if (game_board[i][j] == 0) {
         r = 0;
@@ -93,19 +158,6 @@ void color_board() {
     }
   }
   pixels.show();
-}
-
-void button_push() {
-  int buttonState = digitalRead(2);
-  if (buttonState == LOW && oldbuttonState == HIGH)
-  {
-    oldbuttonState = LOW;
-    random_drop();
-  }
-  if (buttonState == HIGH) {
-    oldbuttonState = HIGH;
-  }
-  //random_drop();
 }
 
 void random_drop() {
@@ -169,12 +221,12 @@ void drop_shape() {
   }
   add_to_gameboard();
   row_check();
-  Serial.println(score);
 }
 
 void drop_delay() {
   for (int i = 0; i <= 20; i++) {
     delay(50);
+    time_played += 0.05;
     xAxis = analogRead(xPin);
     yAxis = analogRead(yPin);
     int buttonState = digitalRead(2);
@@ -228,7 +280,7 @@ void add_to_gameboard() {
 }
 
 void test_stacker() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 20; i++) {
     for (int j = 0; j < 5; j++) {
       if (game_board[i][j] != 0) {
         for (int k = 0; k < 4; k++) {
@@ -242,7 +294,7 @@ void test_stacker() {
 }
 
 void row_check() {
-  for (int r = 9; r > -1; r--) {
+  for (int r = 19; r > -1; r--) {
     if (game_board[r][0] != 0 && game_board[r][1] != 0 && game_board[r][2] != 0 && game_board[r][3] != 0 && game_board[r][4] != 0) {
       clear_row(r);
       score++;
@@ -252,9 +304,9 @@ void row_check() {
 }
 
 void clear_row(int row) {
-  for (int r = row; r < 10; r++) {
+  for (int r = row; r < 20; r++) {
     for (int c = 0; c < 5; c++) {
-      if (r != 9) {
+      if (r != 19) {
         game_board[r][c] = game_board[r + 1][c];
       }
       else {
@@ -305,12 +357,12 @@ void drop_to_bottom() {
       row_to_bottom = (box[i] / 5);
     }
   }
-  for (int r = 0; r < 10; r++) {
+  for (int r = 0; r < 20; r++) {
     for (int c = 0; c < 5; c++) {
       if (game_board[r][c] != 0) {
         for (int i = 0; i < 4; i++) {
-          if (box[i] % 5 == c && row_to_bottom > ((box[i]/5) - r - 1)) {
-            row_to_bottom = (box[i]/5) - r - 1;
+          if (box[i] % 5 == c && row_to_bottom > ((box[i] / 5) - r - 1)) {
+            row_to_bottom = (box[i] / 5) - r - 1;
           }
         }
       }
@@ -334,6 +386,7 @@ void rotate_shape() {
   int c2;
   int c3;
   int c4;
+  bool allow_turn = true;
   int copy_box[4];
   for (int i = 0; i < 4; i++) {
     copy_box[i] = box[i];
@@ -462,26 +515,26 @@ void rotate_shape() {
     case 20:
       c1 = 6;
       c2 = 0;
-      c3 = -4;
-      c4 = -6;
+      c3 = -6;
+      c4 = -4;
       break;
     case 21:
       c1 = -4;
       c2 = 0;
-      c3 = -6;
-      c4 = 4;
+      c3 = 4;
+      c4 = -6;
       break;
     case 22:
       c1 = -6;
       c2 = 0;
-      c3 = 4;
-      c4 = 6;
+      c3 = 6;
+      c4 = 4;
       break;
     case 23:
       c1 = 4;
       c2 = 0;
-      c3 = 6;
-      c4 = -4;
+      c3 = -4;
+      c4 = 6;
       break;
     case 24:
       c1 = 2;
@@ -508,22 +561,108 @@ void rotate_shape() {
       c4 = -4;
       break;
   }
-  box[0] = copy_box[0] + c1;
-  box[1] = copy_box[1] + c2;
-  box[2] = copy_box[2] + c3;
-  box[3] = copy_box[3] + c4;
-  if (box[7] % 4 == 3) {
-    box[7] = box[7] - 3;
-  }
-  else {
-    box[7]++;
+  copy_box[0] = box[0] + c1;
+  copy_box[1] = box[1] + c2;
+  copy_box[2] = box[2] + c3;
+  copy_box[3] = box[3] + c4;
+  for (int i = 0; i < 20; i++) {
+    for (int j = 0; j < 5; j++) {
+      for (int k = 0; k < 4; k++) {
+        if (game_board[i][j] != 0 && copy_box[k] / 5 == i && copy_box[k] % 5 == j) {
+          allow_turn = false;
+          break;
+        }
+      }
+    }
   }
   for (int i = 0; i < 4; i++) {
-    pixels.setPixelColor(copy_box[i], pixels.Color(0, 0, 0));
+    if (copy_box[i] > 99) {
+      allow_turn = false;
+      break;
+    }
   }
-  pixels.show();
+  int connected_count_1 = 0;
+  int connected_count_2 = 0;
+
   for (int i = 0; i < 4; i++) {
-    pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
+    if ((box[i] / 5 == box[i + 1] / 5 && box[i + 1] % 5 - box[i] % 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] / 5 == box[i + 1] / 5 && box[i] % 5 - box[i + 1] % 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] % 5 == box[i + 1] % 5 && box[i] / 5 - box[i + 1] / 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] % 5 == box[i + 1] % 5 && box[i + 1] / 5 - box[i] / 5 == 1)) {
+      connected_count_1++;
+    }
   }
-  pixels.show();
+  for (int i = 0; i < 3; i++) {
+    if ((copy_box[i] / 5 == copy_box[i + 1] / 5 && copy_box[i + 1] % 5 - copy_box[i] % 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] / 5 == copy_box[i + 1] / 5 && copy_box[i] % 5 - copy_box[i + 1] % 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] % 5 == copy_box[i + 1] % 5 && copy_box[i] / 5 - copy_box[i + 1] / 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] % 5 == copy_box[i + 1] % 5 && copy_box[i + 1] / 5 - copy_box[i] / 5 == 1)) {
+      connected_count_2++;
+    }
+  }
+  for (int i = 1; i < 4; i++) {
+    if ((box[i] / 5 == box[i - 1] / 5 && box[i - 1] % 5 - box[i] % 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] / 5 == box[i - 1] / 5 && box[i] % 5 - box[i - 1] % 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] % 5 == box[i - 1] % 5 && box[i] / 5 - box[i - 1] / 5 == 1)) {
+      connected_count_1++;
+    }
+    if ((box[i] % 5 == box[i - 1] % 5 && box[i - 1] / 5 - box[i] / 5 == 1)) {
+      connected_count_1++;
+    }
+  }
+  for (int i = 1; i < 4; i++) {
+    if ((copy_box[i] / 5 == copy_box[i - 1] / 5 && copy_box[i - 1] % 5 - copy_box[i] % 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] / 5 == copy_box[i - 1] / 5 && copy_box[i] % 5 - copy_box[i - 1] % 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] % 5 == copy_box[i - 1] % 5 && copy_box[i] / 5 - copy_box[i - 1] / 5 == 1)) {
+      connected_count_2++;
+    }
+    if ((copy_box[i] % 5 == copy_box[i - 1] % 5 && copy_box[i - 1] / 5 - copy_box[i] / 5 == 1)) {
+      connected_count_2++;
+    }
+  }
+
+  if (connected_count_1 != connected_count_2) {
+    allow_turn = false;
+  }
+
+  if (allow_turn) {
+    if (box[7] % 4 == 3) {
+      box[7] = box[7] - 3;
+    }
+    else {
+      box[7]++;
+    }
+    for (int i = 0; i < 4; i++) {
+      pixels.setPixelColor(box[i], pixels.Color(0, 0, 0));
+    }
+    pixels.show();
+    for (int i = 0; i < 4; i++) {
+      pixels.setPixelColor(copy_box[i], pixels.Color(box[4], box[5], box[6]));
+    }
+    pixels.show();
+    for (int i = 0; i < 4; i++) {
+      box[i] = copy_box[i];
+
+    }
+  }
 }
