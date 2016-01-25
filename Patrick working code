@@ -50,10 +50,29 @@ void button_push() {
   if (buttonState == LOW && oldbuttonState == HIGH)
   {
     oldbuttonState = LOW;
+    tetris_music();
     game_play();
   }
   if (buttonState == HIGH) {
     oldbuttonState = HIGH;
+  }
+}
+
+void tetris_music()
+{
+  // constants for tetris song
+  const int buzzerPin = 13; // piezo buzzer pin
+  char notes[] = "EbCDCbaaCEDCbCDECaa";
+  int beats[] = {2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 1};
+  int tempo = 200;
+  int songLength = 19;
+  int i, duration;
+
+  for (i = 0; i < songLength; i++) // step through song arrays
+  {
+    duration = beats[i] * tempo; // how long note is played
+    tone(buzzerPin, frequency(notes[i]), duration);
+    delay(duration);
   }
 }
 
@@ -76,10 +95,11 @@ void game_play() {
 }
 
 void you_win() {
+  win_music();
   Serial.println("Congrats you won!!!!");
   Serial.print("Time Played: ");
   Serial.print(time_played);
-  Serial.print(" |Score: ");
+  Serial.print(" | Score: ");
   Serial.println(score);
   theaterChaseRainbow(10);
   for (int i = 0; i < 20; i++) {
@@ -90,6 +110,23 @@ void you_win() {
   color_board();
   time_played = 0;
   score = 0;
+}
+
+void win_music()
+{
+  const int buzzerPin = 13;
+  char win_notes[] = "abCDFAGFECEDEbbCDECaa";
+  int win_beats[] = {1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2};
+  int win_tempo = 200;
+  int win_songLength = 21;
+  int k, win_duration;
+
+  for (k = 0; k < win_songLength; k++) // step through song arrays
+  {
+    win_duration = win_beats[k] * win_tempo; // how long note is played
+    tone(buzzerPin, frequency(win_notes[k]), win_duration);
+    delay(win_duration);
+  }
 }
 
 void theaterChaseRainbow(uint8_t wait) {
@@ -123,10 +160,11 @@ uint32_t Wheel(byte WheelPos) {
 }
 
 void you_lose() {
+  lose_music();
   Serial.println("Sorry, You Lost. Try Again");
   Serial.print("Time Played: ");
   Serial.print(time_played);
-  Serial.print(" |Score: ");
+  Serial.print(" | Score: ");
   Serial.println(score);
   delay(4000);
   winner = false;
@@ -139,6 +177,24 @@ void you_lose() {
   time_played = 0;
   score = 0;
 }
+
+void lose_music()
+{
+  const int buzzerPin = 13;
+  char lose_notes[] = "cegCgec";
+  int lose_beats[] = {2,2,2,2,2,2,2};
+  int lose_tempo = 300;
+  int lose_songLength = 7;
+  int l, lose_duration;
+
+  for (l = 0; l < lose_songLength; l++) // step through song arrays
+  {
+    lose_duration = lose_beats[l] * lose_tempo; // how long note is played
+    tone(buzzerPin, frequency(lose_notes[l]), lose_duration);
+    delay(lose_duration);
+  }
+}
+
 
 void color_board() {
   for (int i = 0; i < 20; i++) {
@@ -341,8 +397,28 @@ void clear_row(int row) {
       }
       else {
         game_board[r][c] = 0;
+        clear_row_music();
       }
     }
+  }
+}
+
+void clear_row_music()
+{
+  const int buzzerPin = 13;
+  char clear_notes[] = "CDEFGABC";
+  int clear_beats[] = {1,1,1,1,1,1,3};
+  int clear_tempo = 10;
+  int clear_songLength = 7;
+  int j, clear_duration;
+
+  // add function for when row is cleared
+
+  for (j = 0; j < clear_songLength; j++) // step through song arrays
+  {
+    clear_duration = clear_beats[j] * clear_tempo; // how long note is played
+    tone(buzzerPin, frequency(clear_notes[j]), clear_duration);
+    delay(clear_duration);
   }
 }
 
@@ -695,4 +771,37 @@ void rotate_shape() {
 
     }
   }
+}
+
+int frequency(char note)
+{
+  // This function takes a note character (a-g), and returns the
+  // corresponding frequency in Hz for the tone() function.
+
+  int i;
+  const int numNotes = 13;  // number of notes we're storing
+
+  // The following arrays hold the note characters and their
+  // corresponding frequencies. The last "C" note is uppercase
+  // to separate it from the first lowercase "c". If you want to
+  // add more notes, you'll need to use unique characters.
+
+  // For the "char" (character) type, we put single characters
+  // in single quotes.
+
+  char names[] = { 'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C', 'D', 'E', 'F', 'G', 'A'};
+  int frequencies[] = {262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698};
+
+  // Now we'll search through the letters in the array, and if
+  // we find it, we'll return the frequency for that note.
+
+  for (i = 0; i < numNotes; i++)  // Step through the notes
+  {
+    if (names[i] == note)         // Is this the one?
+    {
+      return (frequencies[i]);    // Yes! Return the frequency
+    }
+  }
+  return (0); // We looked through everything and didn't find it,
+  // but we still need to return a value, so return 0.
 }
