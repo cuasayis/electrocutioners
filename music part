@@ -1,0 +1,150 @@
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
+
+void start_game()
+{
+  const int redbuttonPin = 12;
+  int redbuttonState = digitalRead(redbuttonPin);
+
+  if (redbuttonState == LOW)
+  {
+    //random_drop();
+    start_time();
+    tetris_music();
+  }
+}
+
+void start_time()
+{
+  Serial.print("Let's play Tetris!");
+  
+  int count;
+  for (count = 0; count < 60;)
+  {
+    count = count + 1; // increment count
+    delay(1000); // wait one sec
+    Serial.println("Time Played: 0:");
+    Serial.print(count);
+  }
+}
+
+void tetris_music()
+{
+  // constants for tetris song
+  const int buzzerPin = 13; // piezo buzzer pin
+  char notes[] = "EbCDCbaaCEDCbCDECaaabCDFAGFECEDEbbCDECaa";
+  int beats[] = {2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2};
+  int tempo = 200;
+  int songLength = 40;
+  int i, duration;
+
+  for (i = 0; i < songLength; i++) // step through song arrays
+  {
+    duration = beats[i] * tempo; // how long note is played
+    tone(buzzerPin, frequency(notes[i]), duration);
+    delay(duration);
+  }
+}
+
+void clear_row_music()
+{
+  const int buzzerPin = 13;
+  char clear_notes[] = "CDEFGABC";
+  int clear_beats[] = {1,1,1,1,1,1,3};
+  int clear_tempo = 400;
+  int clear_songLength = 7;
+  int j, clear_duration;
+
+  // add function for when row is cleared
+
+  for (j = 0; j < clear_songLength; j++) // step through song arrays
+  {
+    clear_duration = clear_beats[j] * clear_tempo; // how long note is played
+    tone(buzzerPin, frequency(clear_notes[j]), clear_duration);
+    delay(clear_duration);
+  }
+
+  tetris_music(); // play tetris music again
+}
+
+void win_music()
+{
+  const int buzzerPin = 13;
+  char win_notes[] = "CDEFGABC";
+  int win_beats[] = {1,1,1,1,1,1,3};
+  int win_tempo = 400;
+  int win_songLength = 7;
+  int k, win_duration;
+
+  // add function for when win game
+
+  for (k = 0; k < win_songLength; k++) // step through song arrays
+  {
+    win_duration = win_beats[k] * win_tempo; // how long note is played
+    tone(buzzerPin, frequency(win_notes[k]), win_duration);
+    delay(win_duration);
+  }
+
+  tetris_music(); // play tetris music again
+}
+
+void lose_music()
+{
+  const int buzzerPin = 13;
+  char lose_notes[] = "CDEFGABC";
+  int lose_beats[] = {1,1,1,1,1,1,3};
+  int lose_tempo = 400;
+  int lose_songLength = 7;
+  int l, lose_duration;
+
+  // add function for when lose game
+
+  for (l = 0; l < lose_songLength; l++) // step through song arrays
+  {
+    lose_duration = lose_beats[l] * lose_tempo; // how long note is played
+    tone(buzzerPin, frequency(lose_notes[l]), lose_duration);
+    delay(lose_duration);
+  }
+
+  tetris_music(); // play tetris music again
+}
+
+int frequency(char note)
+{
+  // This function takes a note character (a-g), and returns the
+  // corresponding frequency in Hz for the tone() function.
+
+  int i;
+  const int numNotes = 13;  // number of notes we're storing
+
+  // The following arrays hold the note characters and their
+  // corresponding frequencies. The last "C" note is uppercase
+  // to separate it from the first lowercase "c". If you want to
+  // add more notes, you'll need to use unique characters.
+
+  // For the "char" (character) type, we put single characters
+  // in single quotes.
+
+  char names[] = { 'c', 'd', 'e', 'f', 'g', 'a', 'b', 'C', 'D', 'E', 'F', 'G', 'A'};
+  int frequencies[] = {262, 294, 330, 349, 392, 440, 494, 523, 587, 659, 698};
+
+  // Now we'll search through the letters in the array, and if
+  // we find it, we'll return the frequency for that note.
+
+  for (i = 0; i < numNotes; i++)  // Step through the notes
+  {
+    if (names[i] == note)         // Is this the one?
+    {
+      return (frequencies[i]);    // Yes! Return the frequency
+    }
+  }
+  return (0); // We looked through everything and didn't find it,
+  // but we still need to return a value, so return 0.
+}
