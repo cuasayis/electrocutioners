@@ -117,7 +117,7 @@ void game_play() {
 }
 
 void you_win() {
-  // Function to run when plays wins.
+  // Function to run when player wins.
   win_music();
   Serial.println("Congrats you won!!!!");
   Serial.print("Time Played: ");
@@ -202,8 +202,8 @@ void you_lose() {
   score = 0;
 }
 
-void lose_music()
-{
+void lose_music() {
+  // Music to play when player loses.
   const int buzzerPin = 13;
   char lose_notes[] = "cegCgec";
   int lose_beats[] = {2,2,2,2,2,2,2};
@@ -409,6 +409,7 @@ void test_stacker() {
 }
 
 void row_check() {
+  // Check if row can be cleared and increases the score
   for (int r = 19; r > -1; r--) {
     if (game_board[r][0] != 0 && game_board[r][1] != 0 && game_board[r][2] != 0 && game_board[r][3] != 0 && game_board[r][4] != 0) {
       clear_row(r);
