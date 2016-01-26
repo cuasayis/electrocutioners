@@ -13,7 +13,7 @@ This program creates a tetris game using Adafruit Neopixel.
 #define PIXEL_PIN 6
 #define PIXEL_COUNT  100
 
-// Define arrys for Tetrmino pieces
+// Define arrys for Tetrimino pieces
 int yellow_block[] = {98, 99, 93, 94, 255, 255, 0, 12, 1};
 int purple_T[] = {99, 98, 97, 93, 128, 0, 128, 22, 2};
 int blue_L[] = {97, 92, 93, 94, 0, 0, 255, 4, 3};
@@ -98,6 +98,7 @@ void tetris_music()
 }
 
 void game_play() {
+  // Run the game.
   winner = true;
   bool exit_ = true;
   while (score < 30 && exit_) {
@@ -418,6 +419,7 @@ void row_check() {
 }
 
 void clear_row(int row) {
+  // Clears a row if row get filled with pieces.
   for (int r = row; r < 20; r++) {
     for (int c = 0; c < 5; c++) {
       if (r != 19) {
@@ -431,8 +433,8 @@ void clear_row(int row) {
   }
 }
 
-void clear_row_music()
-{
+void clear_row_music() {
+  // Music to be played when row is cleared.
   const int buzzerPin = 13;
   char clear_notes[] = "CDEFGABC";
   int clear_beats[] = {1,1,1,1,1,1,3};
@@ -451,6 +453,7 @@ void clear_row_music()
 }
 
 void move_sideways(int p) {
+  // Move the pieces sideways.
   bool possible = HIGH;
   for (int i = 0; i < 4; i++) {
     if (box[i] % 5 == 0 && p == -1) {
@@ -484,6 +487,7 @@ void drop_pixels() {
 }
 
 void drop_to_bottom() {
+  // Drops the piece to the bottom.
   int row_to_bottom ;
   row_to_bottom = box[0] / 5;
   for (int i = 1; i < 4; i++) {
@@ -516,6 +520,7 @@ void drop_to_bottom() {
 }
 
 void rotate_shape() {
+  // Rotates the piece.
   int c1;
   int c2;
   int c3;
