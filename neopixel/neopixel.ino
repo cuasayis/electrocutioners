@@ -1,5 +1,5 @@
 /*NeoPixel Group Project - ECE 160 - Engineering Practice
-Ryan Greenlee, Izzy Cuasay, and Patrick Tomas
+Ryan Greenlee, Izzy Cuasay, and Patrick Thomas
 Revised: 1/25/ 2016
 
 This program creates a tetris game using Adafruit Neopixel.
@@ -66,6 +66,7 @@ void loop() {
 }
 
 void button_push() {
+  // Starts game when button is pressed
   int buttonState = digitalRead(9);
   if (buttonState == LOW && oldbuttonState == HIGH)
   {
@@ -115,6 +116,7 @@ void game_play() {
 }
 
 void you_win() {
+  // Function to run when plays wins.
   win_music();
   Serial.println("Congrats you won!!!!");
   Serial.print("Time Played: ");
@@ -180,6 +182,7 @@ uint32_t Wheel(byte WheelPos) {
 }
 
 void you_lose() {
+  // Function to run when player loses
   lose_music();
   Serial.println("Sorry, You Lost. Try Again");
   Serial.print("Time Played: ");
@@ -217,6 +220,7 @@ void lose_music()
 
 
 void color_board() {
+  // Colors the NeoPixel board
   for (int i = 0; i < 20; i++) {
     for (int j = 0; j < 5; j++) {
       if (game_board[i][j] == 0) {
@@ -267,6 +271,7 @@ void color_board() {
 }
 
 void random_drop() {
+  // Places random piece on the board
   int rn = random(1, 8);
   switch (rn) {
     case 1:
@@ -309,6 +314,7 @@ void random_drop() {
 }
 
 void drop_shape() {
+  // Move piece down the board
   tracker = true;
   while (tracker) {
     for (int i = 0; i < 4; i++) {
@@ -330,6 +336,8 @@ void drop_shape() {
 }
 
 void drop_delay() {
+  // Delays dropping of the piece and reads joystick to move the
+  // piece based on input.
   for (int i = 0; i <= 10; i++) {
     delay(50);
     time_played += 0.05;
