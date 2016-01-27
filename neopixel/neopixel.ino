@@ -1,8 +1,13 @@
-/*NeoPixel Group Project - ECE 160 - Engineering Practice
-Ryan Greenlee, Izzy Cuasay, and Patrick Thomas
-Revised: 1/25/ 2016
+/*
+  Patrick Thomas, Izzy Cuasay, Ryan Greenlee - NeoPixel Group Project
+  Date Created: January 12, 2016
+  Due: January 27, 2016
 
-This program creates a tetris game using Adafruit Neopixel.
+  This program creates a tetris game using Adafruit Neopixel. The joystick will
+  control the rotation and movement of the tetris pieces. To win, the player
+  must successful play for one minute. The player will lose if all the pieces
+  stack to the top before one minute is over. 
+  The hardware used are two Adafruit NeoPixels, joystick, button, and piezo buzzer.
 */
 
 // Include the Adafruit_NeoPixel library
@@ -23,13 +28,13 @@ int red_Z[] = {97, 98, 93, 94, 255, 0, 0, 24, 6};
 int cyan_stick[] = {96, 97, 98, 99, 0, 255, 255, 0, 7};
 int box[9];
 int game_board[20][5];
-int r;
-int g;
-int b;
+int r;  // red
+int g;  // green
+int b;  // blue
 int score;
 bool oldbuttonState;
-const int xPin = A0;
-const int yPin = A1;
+const int xPin = A0;  // joystick x-axis pin
+const int yPin = A1;  // joystick y-axis pin
 int xAxis, yAxis;
 bool oldState;
 bool tracker;
@@ -49,7 +54,7 @@ void setup() {
   // Initialize pixels
   pixels.begin();
   pixels.show();
-  score = 0;
+  score = 0;  
 
   // Map all the pixels to game_board
   for (int i = 0; i < 20; i++) {
@@ -62,17 +67,16 @@ void setup() {
 }
 
 void loop() {
-  button_push();
+  button_push();  // game will start once button is pushed
 }
 
 void button_push() {
-  // Starts game when button is pressed
-  int buttonState = digitalRead(9);
-  if (buttonState == LOW && oldbuttonState == HIGH)
+  int buttonState = digitalRead(9); // button is on pin 9
+  if (buttonState == LOW && oldbuttonState == HIGH) // when button is pressed
   {
     oldbuttonState = LOW;
-    tetris_music();
-    game_play();
+    tetris_music();   // start tetris music
+    game_play();      // start random drop of tetris piece
   }
   if (buttonState == HIGH) {
     oldbuttonState = HIGH;
@@ -83,10 +87,10 @@ void tetris_music()
 {
   // constants for tetris song
   const int buzzerPin = 13; // piezo buzzer pin
-  char notes[] = "EbCDCbaaCEDCbCDECaa";
+  char notes[] = "EbCDCbaaCEDCbCDECaa"; 
   int beats[] = {2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 2, 2, 2, 2, 1};
   int tempo = 200;
-  int songLength = 19;
+  int songLength = 19;  // how many notes total
   int i, duration;
 
   for (i = 0; i < songLength; i++) // step through song arrays
@@ -101,11 +105,11 @@ void game_play() {
   // Run the game.
   winner = true;
   bool exit_ = true;
-  while (score < 30 && exit_) {
-    random_drop();
-    for (int j = 0; j < 5; j++) {
-      if (game_board[19][j] != 0) {
-        you_lose();
+  while (score < 30 && exit_) {   // run until score is equal to 30
+    random_drop();  // randomly drop pieces
+    for (int j = 0; j < 5; j++) { // check through five columns
+      if (game_board[19][j] != 0) { // lose if pieces are stacked to the top
+        you_lose(); 
         exit_ = false;
         break;
       }
@@ -118,26 +122,26 @@ void game_play() {
 
 void you_win() {
   // Function to run when player wins.
-  win_music();
+  win_music();  // play win music
   Serial.println("Congrats you won!!!!");
   Serial.print("Time Played: ");
   Serial.print(time_played);
   Serial.print(" | Score: ");
   Serial.println(score);
   theaterChaseRainbow(10);
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 20; i++) {  // clear board
     for (int j = 0; j < 5; j++) {
       game_board[i][j] = 0;
     }
   }
-  color_board();
-  time_played = 0;
-  score = 0;
+  color_board(); // set colors
+  time_played = 0;  // reset time played
+  score = 0;  // reset score
 }
 
 void win_music()
 {
-  const int buzzerPin = 13;
+  const int buzzerPin = 13; // piezo buzzer on pin 13
   char win_notes[] = "abCDFAGFECEDEbbCDECaa";
   int win_beats[] = {1, 1, 1, 2, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 2, 2, 2, 2};
   int win_tempo = 200;
@@ -184,22 +188,22 @@ uint32_t Wheel(byte WheelPos) {
 
 void you_lose() {
   // Function to run when player loses
-  lose_music();
+  lose_music(); // play lose music
   Serial.println("Sorry, You Lost. Try Again");
   Serial.print("Time Played: ");
-  Serial.print(time_played);
+  Serial.print(time_played);  // show how much time played
   Serial.print(" | Score: ");
-  Serial.println(score);
+  Serial.println(score);  // show how many lines cleared
   delay(4000);
   winner = false;
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 20; i++) {  // clear board
     for (int j = 0; j < 5; j++) {
       game_board[i][j] = 0;
     }
   }
-  color_board();
-  time_played = 0;
-  score = 0;
+  color_board(); // set colors
+  time_played = 0;  // reset time
+  score = 0;  // reset score
 }
 
 void lose_music() {
@@ -273,52 +277,52 @@ void color_board() {
 
 void random_drop() {
   // Places random piece on the board
-  int rn = random(1, 8);
+  int rn = random(1, 8);  // randomly choose among seven pieces
   switch (rn) {
-    case 1:
+    case 1: // yellow block
       for (int i = 0; i < 9; i++) {
         box[i] = yellow_block[i];
       }
       break;
-    case 2:
+    case 2: // purple T
       for (int i = 0; i < 9; i++) {
         box[i] = purple_T[i];
       }
       break;
-    case 3:
+    case 3: // blue L
       for (int i = 0; i < 9; i++) {
         box[i] = blue_L[i];
       }
       break;
-    case 4:
+    case 4: // orange L
       for (int i = 0; i < 9; i++) {
         box[i] = orange_L[i];
       }
       break;
-    case 5:
+    case 5: // green Z
       for (int i = 0; i < 9; i++) {
         box[i] = green_Z[i];
       }
       break;
-    case 6:
+    case 6: // red Z
       for (int i = 0; i < 9; i++) {
         box[i] = red_Z[i];
       }
       break;
-    case 7:
+    case 7: // cyan stick
       for (int i = 0; i < 9; i++) {
         box[i] = cyan_stick[i];
       }
       break;
   }
-  drop_shape();
+  drop_shape(); // drop shape when shape is selected
 }
 
 void drop_shape() {
   // Move piece down the board
   tracker = true;
   while (tracker) {
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) { 
       pixels.setPixelColor(box[i], pixels.Color(box[4], box[5], box[6]));
     }
     pixels.show();
@@ -342,30 +346,30 @@ void drop_delay() {
   for (int i = 0; i <= 10; i++) {
     delay(50);
     time_played += 0.05;
-    xAxis = analogRead(xPin);
-    yAxis = analogRead(yPin);
-    int buttonState = digitalRead(2);
+    xAxis = analogRead(xPin); // read joystick xPin
+    yAxis = analogRead(yPin); // read joystick yPin
+    int buttonState = digitalRead(2); // joystick button
     if (buttonState == HIGH) {
       oldbuttonState = HIGH;
     }
     if (xAxis < 650 && yAxis < 650 && yAxis > 350) {
       oldState = LOW;
     }
-    if (xAxis > 650 && oldState == LOW) {
-      rotate_shape();
+    if (xAxis > 650 && oldState == LOW) { // joystick is moved up
+      rotate_shape(); // rotate shape
       oldState = HIGH;
     }
-    if (yAxis > 650 && oldState == LOW) {
-      move_sideways(1);
+    if (yAxis > 650 && oldState == LOW) { // move shape to the left
+      move_sideways(1); 
       oldState = HIGH;
     }
-    if (yAxis < 350 && oldState == LOW) {
+    if (yAxis < 350 && oldState == LOW) { // move shape to the right
       move_sideways(-1);
       oldState = HIGH;
     }
-    if (buttonState == LOW && oldbuttonState == HIGH)
+    if (buttonState == LOW && oldbuttonState == HIGH) // when joystick button is pressed
     {
-      drop_to_bottom();
+      drop_to_bottom(); // drop shape to bottom
       oldbuttonState = LOW;
       tracker = false;
       break;
@@ -410,10 +414,10 @@ void test_stacker() {
 
 void row_check() {
   // Check if row can be cleared and increases the score
-  for (int r = 19; r > -1; r--) {
+  for (int r = 19; r > -1; r--) {   // go through each row
     if (game_board[r][0] != 0 && game_board[r][1] != 0 && game_board[r][2] != 0 && game_board[r][3] != 0 && game_board[r][4] != 0) {
-      clear_row(r);
-      score++;
+      clear_row(r); // clear row if full
+      score++;  // add one to score
     }
   }
   color_board();
@@ -428,7 +432,7 @@ void clear_row(int row) {
       }
       else {
         game_board[r][c] = 0;
-        clear_row_music();
+        clear_row_music();  // play clear row music
       }
     }
   }
