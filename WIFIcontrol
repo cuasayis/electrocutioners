@@ -1,0 +1,111 @@
+// Include the proper libraries
+// Make sure these libraries are in the proper directory
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+#include <Servo.h>
+Servo gripper;
+Servo left_wheel;
+Servo right_wheel;
+// Setting up the wireless transceiver
+#define CE_PIN   9
+#define CSN_PIN 10
+
+// Defining the transmit pipe
+// NOTE: the "LL" at the end of the constant is "LongLong" type
+const uint64_t pipe = 0xE8E8F0F0E1LL; // Define the transmit pipe
+
+// Creating a radio object
+RF24 radio(CE_PIN, CSN_PIN); // Create a Radio
+
+// Creating an array to store the button data coming from the transceiver
+int buttonState[5];
+
+void setup() {
+  radio.begin();
+  radio.setChannel(19);
+  radio.openReadingPipe(1, pipe);
+  radio.startListening();
+  gripper.attach(1);
+  left_wheel.attach(2);
+  right_wheel.attach(3);
+}
+
+void loop() {
+
+}
+
+// reads in an array from the wireless transiever and use the function movement_control()
+void reciever() {
+  int servo_direction;
+  if (radio.available()) {
+    bool done = false;
+    while (!done) {
+      done = radio.read(buttonState, sizeof(buttonState));
+      movement_control();
+    }
+  }
+}
+
+// uses input and movement functions to move the robot and to control the grippers
+void movement_control() {
+  bool oldbuttonState1;
+  bool oldbuttonState2;
+  if (buttonState[0] == LOW && oldbuttonState1 == HIGH) {
+    gripper_close();
+    oldbuttonState1 = LOW;
+  }
+  if (buttonState[0] == HIGH) {
+    oldbuttonState1 = HIGH;
+  }
+  if (buttonState[1] == LOW && oldbuttonState2 == HIGH) {
+    gripper_open();
+    oldbuttonState2 = LOW;
+  }
+  if (buttonState[1] == HIGH) {
+    oldbuttonState2 = HIGH;
+  }
+  if (abs((buttonState[3] - 512)) > abs((buttonState[4] - 512))) {
+    robot_movement(buttonState[2], buttonState[3]);
+  }
+  if (abs((buttonState[3] - 512)) < abs((buttonState[4] - 512))) {
+  robot_spin(buttonState[4]);
+  }
+}
+
+// opens the gripper claw
+void gripper_close() {
+  gripper.write(180);
+}
+
+// closes gripper claw around the egg
+void gripper_open() {
+  gripper.write(45);
+}
+
+// spins the robot
+void  robot_spin(int val) {
+  int rw, lw, difference;
+  difference = map(val, 0, 1023, -200, 200);
+  lw = 1490 + difference;
+  rw = 1490 + difference;
+  left_wheel.writeMicroseconds(lw);
+  right_wheel.writeMicroseconds(rw);
+}
+
+// moves the robot forward, backwards and turns
+void robot_movement(int xVal, int yVal) {
+  int lw, rw, speed_bot, difference;
+  speed_bot = map(xVal, 0, 1023, 1680, 1280);
+  difference = map(yVal, 0, 1023, -abs((1680 - speed_bot)), abs((speed_bot - 1680)));
+  rw = speeed_bot;
+  lw = 1490 + (1490 - speed_bot);
+  if (difference > 0) {
+    lw += difference * 2;
+  }
+  if (difference < 0) {
+    rw += difference * 2;
+  }
+  left_wheel.writeMicroseconds(lw);
+  right_wheel.writeMicroseconds(rw);
+}
