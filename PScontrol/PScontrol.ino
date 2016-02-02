@@ -1,7 +1,17 @@
+/*
+  Patrick Thomas, Izzy Cuasay, Ryan Greenlee - Robunny Rumble Project
+  Date Created: January 29, 2016
+  Due: February 2, 2016
+  
+  This program interprets input from a playstation controller.
+*/
+
+// Include appropriate libraries
 #include <Servo.h>
 //#include <Psx_analog.h>
 #include <Psx.h>
 // Includes the Psx Library
+
 // Any pins can be used since it is done in software
 Servo gripper;
 Servo left_wheel;
