@@ -1,3 +1,12 @@
+/*
+  Patrick Thomas, Izzy Cuasay, Ryan Greenlee - Robunny Rumble Project
+  Date Created: January 29, 2016
+  Due: February 2, 2016
+  
+  This program reads from a wireless transciever and interprets
+  commands from a joystick to make the robot move.
+*/
+
 // Include the proper libraries
 // Make sure these libraries are in the proper directory
 #include <SPI.h>
