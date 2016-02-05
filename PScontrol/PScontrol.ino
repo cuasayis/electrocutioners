@@ -1,7 +1,7 @@
 /*
   Patrick Thomas, Izzy Cuasay, Ryan Greenlee - Robunny Rumble Project
   Date Created: January 29, 2016
-  Due: February 2, 2016
+  Due: February 22, 2016
   
   This program interprets input from a playstation controller.
 */
@@ -45,6 +45,8 @@ void loop() {
 }
 
 void PSX_control() {
+  // Read the controls from the PlayStation controller and sends
+  // commands to the robot.
   data = Psx.read();
   Serial.println("Yes");
   if (data & psxR2) {
@@ -81,42 +83,51 @@ void PSX_control() {
     spin_right();
     delay_amount = 20;
   }
+
+  // If no data is being sent, stop the robot
   if (!data) {
     stop_bot();
   }
   delay(delay_amount);
 }
 void forward() {
+  // Move the robot forward
   left_wheel.writeMicroseconds(1280);
   right_wheel.writeMicroseconds(1680);
   delay_amount = 0;
 }
 void backward() {
+  // Move the robot backward
   left_wheel.writeMicroseconds(1680);
   right_wheel.writeMicroseconds(1280);
   delay_amount = 0;
 }
 void stop_bot() {
+  // Stop the robot
   left_wheel.writeMicroseconds(1490);
   right_wheel.writeMicroseconds(1490);
   delay_amount = 0;
 }
 void left() {
+  // Make the robot turn left
   left_wheel.writeMicroseconds(1300);
   right_wheel.writeMicroseconds(1530);
   delay_amount = 0;
 }
 void right() {
+  // Make the robot turn right
   left_wheel.writeMicroseconds(1450);
   right_wheel.writeMicroseconds(1680);
   delay_amount = 0;
 }
 void spin_left() {
+  // Make the robot spin left
   left_wheel.writeMicroseconds(1680);
   right_wheel.writeMicroseconds(1680);
 }
 
 void spin_right() {
+  // Make the robot spin right
   left_wheel.writeMicroseconds(1300);
   right_wheel.writeMicroseconds(1300);
 }
