@@ -1,7 +1,7 @@
 /*
   Patrick Thomas, Izzy Cuasay, Ryan Greenlee - Robunny Rumble Project
   Date Created: January 29, 2016
-  Due: February 2, 2016
+  Due: February 22, 2016
   
   This program reads from a wireless transciever and interprets
   commands from a joystick to make the robot move.
@@ -148,11 +148,13 @@ void robot_movement(int xVal, int yVal) {
   right_wheel.writeMicroseconds(rw);
 }
 
+// Stop the robot
 void stop_bot() {
   left_wheel.writeMicroseconds(1490);
   right_wheel.writeMicroseconds(1490);
 }
 
+// Control the gripper
 void gripper_control(int xVal){
   int angle = map (xVal, 0, 1023, 45, 180);
   gripper.write(angle);
