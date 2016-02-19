@@ -1,13 +1,36 @@
 /*Joy_Stick_PS2.ino
-   Authors: Patrick Thomas, Izzy Causay, and Ryan Greenlee
+   Authors: Patrick Thomas, Izzy Cuasay, and Ryan Greenlee
    Created: February 10, 2016
 
-   This program controls a BOEBOT first by autonoumus conrol and then wirelessly using a PS2 controller and bluetooth dongle on the 
+   This program controls a BOEBOT first by autonomous control and then wirelessly using a PS2 controller and bluetooth dongle on the 
    bot. The autonomous program runs once and then stays put until the user presses the start button on the PS2 controller allowing
    user control of the bot. When controlled by the user, the bot moves based on the button pressed or direction the joystick is moved
    on the PS2 controller.
+   
+   The hardware includes the Boebot, three servos, gripper, two sonar sensors, flex sensor, joystick, wireless transceiver, Playstation
+   controller, and Bluetooth dongle.
+   
+   The program includes the following functions:
+   autonomous():        commands for autonomous control of the robot
+   back_up():           backs up robot for 1.5 seconds
+   bump_wall():         nudges bot towards the wall to the left
+   bump_left():         moves bot to the left
+   turn_around():       turns robot around
+   turn_right():        turns robot 90 degrees right
+   PS2_control():       reads values from PS controller and then desginates actions for the robot to do
+   gripper_open():      opens the gripper claw
+   gripper_close():     closes gripper claw
+   stop_bot():          stops the robot
+   robot_spin(int val): spins the robot based on input value from the joystick
+   backward():          moves bot backwards
+   forward():           moves bot forwards
+   forward_tap():       moves the bot forward for pad delay milliseconds then stops
+   backward_tap():      moves the bot backward for pad delay milliseconds then stops
+   left_tap():          spins the bot left for pad delay milliseconds then stops
+   right_tap():         spins the bot right for pad delay milliseconds then stops
+   veer_right():        moves the bot forward while turning to the right
+   veer_left():         moves the bot forward while turning to the left
 
-  *******************add functions and global variables***************************************
 */
 
 
@@ -60,7 +83,7 @@ void loop() {
   autonomous();         // begins autonomous control mode for the robot
 }
 
-// commands for autonoumus control of the robot
+// commands for autonomous control of the robot
 void autonomous() {
   bool starter = true;                    // creates boolean object for when to start the bot
   stop_bot();                             // makes sure bot is not moving
